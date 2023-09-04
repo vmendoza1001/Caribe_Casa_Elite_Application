@@ -15,6 +15,10 @@ public class CustomerService {
     public Customer createOrUpdateCustomer(Customer customer) {
         return customerRepository.save(customer);
     }
+    public Customer findByUsername(String username) {
+        return customerRepository.findByUser_Username(username);
+    }
+
 
     public Optional<Customer> findById(Long id) {
         return customerRepository.findById(id);

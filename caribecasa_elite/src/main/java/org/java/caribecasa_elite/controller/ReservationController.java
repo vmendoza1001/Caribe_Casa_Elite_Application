@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/reservation")
@@ -35,17 +36,25 @@ public class ReservationController {
     // Save the new reservation
     @PostMapping("/save")
     public String saveReservation(@ModelAttribute("reservation") Reservation reservation, Principal principal) {
-        reservationService.save(reservation, principal.getName());
+        reservationService.createOrUpdateReservation(reservation, principal.getName());
         return "redirect:/reservation/all";
     }
+
 
     // Edit an existing reservation
     @GetMapping("/edit/{id}")
     public String editReservation(@PathVariable Long id, Model model) {
-        Reservation reservation = reservationService.findById(id);
-        model.addAttribute("reservation", reservation);
-        return "reservation-form";
+        Optional<Reservation> optionalReservation = reservationService.findById(id);
+        if (optionalReservation.isPresent()) {
+            Reservation reservation = optionalReservation.get();
+            model.addAttribute("reservation", reservation);
+            return "reservation-form";
+        } else {
+            // Handle the case where the reservation is not found, e.g., redirect to an error page.
+            return "error-page";
+        }
     }
+
 
     // Delete a reservation
     @GetMapping("/delete/{id}")
